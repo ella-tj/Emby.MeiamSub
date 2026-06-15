@@ -1,13 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <Version>1.0.14.0</Version>
     <AssemblyVersion>1.0.14.0</AssemblyVersion>
     <FileVersion>1.0.14.0</FileVersion>
-    <Version>1.0.14.0</Version>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -15,27 +13,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Thumb.png" />
+    <PackageReference Include="Jellyfin.Controller" Version="10.11.11" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Thumb.png" />
+    <None Update="thumb.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
-  
   <ItemGroup>
-    <PackageReference Include="MediaBrowser.Common" Version="4.9.1.90" />
-    <PackageReference Include="MediaBrowser.Server.Core" Version="4.9.1.90" />
-  </ItemGroup>
-
-  
-  <ItemGroup>
-    <Folder Include="Configuration\" />
+    <EmbeddedResource Include="Configuration\configPage.html" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(SolutionDir)$(ConfigurationName)\" SkipUnchangedFiles="false" />
   </Target>
-
 
 </Project>

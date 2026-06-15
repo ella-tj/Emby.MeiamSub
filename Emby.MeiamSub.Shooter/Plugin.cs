@@ -1,4 +1,4 @@
-﻿using MediaBrowser.Common.Configuration;
+using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Drawing;
 using System;

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>MeiamSub.Assrt</title>
+</head>
+<body>
+    <div id="MeiamSubAssrtConfigPage" data-role="page" class="page type-interior pluginConfigurationPage"
+        data-require="emby-checkbox,emby-input">
+        <div data-role="content">
+            <div class="content-primary">
+                <form id="MeiamSubAssrtConfigForm">
+                    <div class="verticalSection">
+                        <h2 class="sectionTitle">伪射手字幕搜索设置 (Assrt)</h2>
+                        
+                        <div class="inputContainer">
+                            <label class="inputLabel" for="AssrtApiToken">Assrt API Token</label>
+                            <input id="AssrtApiToken" name="AssrtApiToken" type="text" is="emby-input" placeholder="请输入 Assrt.net API Token" />
+                            <div class="fieldDescription">
+                                请在 <a href="https://assrt.net" target="_blank">assrt.net</a> 注册并获取你的 32 位 API Token。
+                            </div>
+                        </div>
+
+                        <div class="checkboxContainer checkboxContainer-withDescription">
+                            <label class="emby-checkbox-label">
+                                <input id="EnableUseMetadata" name="EnableUseMetadata" type="checkbox"
+                                    is="emby-checkbox" />
+                                <span>使用元数据搜索字幕</span>
+                            </label>
+                            <div class="fieldDescription">
+                                勾选此项后，使用元数据中的剧集名称和季集编号搜索字幕，而非文件名。
+                                <br />
+                                剧集将使用 "剧集名 S01E01" 格式；电影将使用影片名称。建议开启以提升模糊检索成功率。
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                            <span>保存</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            var MeiamSubAssrtConfig = {
+                pluginUniqueId: 'E693CDAB-8E8C-4D12-BBDF-3FE564CD61F0'
+            };
+
+            document.querySelector('#MeiamSubAssrtConfigPage')
+                .addEventListener('pageshow', function () {
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(MeiamSubAssrtConfig.pluginUniqueId).then(function (config) {
+                        document.querySelector('#AssrtApiToken').value = config.AssrtApiToken || '';
+                        document.querySelector('#EnableUseMetadata').checked = config.EnableUseMetadata;
+                        Dashboard.hideLoadingMsg();
+                    });
+                });
+
+            document.querySelector('#MeiamSubAssrtConfigForm')
+                .addEventListener('submit', function (e) {
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(MeiamSubAssrtConfig.pluginUniqueId).then(function (config) {
+                        config.AssrtApiToken = document.querySelector('#AssrtApiToken').value;
+                        config.EnableUseMetadata = document.querySelector('#EnableUseMetadata').checked;
+                        ApiClient.updatePluginConfiguration(MeiamSubAssrtConfig.pluginUniqueId, config).then(function (result) {
+                            Dashboard.processPluginConfigurationUpdateResult(result);
+                        });
+                    });
+                    e.preventDefault();
+                    return false;
+                });
+        </script>
+    </div>
+</body>
+</html>

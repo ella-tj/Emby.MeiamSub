@@ -1,4 +1,4 @@
-﻿using Jellyfin.MeiamSub.Shooter.Configuration;
+using Jellyfin.MeiamSub.Shooter.Configuration;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Serialization;

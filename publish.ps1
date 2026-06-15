@@ -28,14 +28,18 @@ $ThunderCsproj = "Jellyfin.MeiamSub.Thunder\Jellyfin.MeiamSub.Thunder.csproj"
 $ThunderMeta = "Jellyfin.MeiamSub.Thunder\meta.json"
 $ShooterCsproj = "Jellyfin.MeiamSub.Shooter\Jellyfin.MeiamSub.Shooter.csproj"
 $ShooterMeta = "Jellyfin.MeiamSub.Shooter\meta.json"
+$AssrtCsproj = "Jellyfin.MeiamSub.Assrt\Jellyfin.MeiamSub.Assrt.csproj"
+$AssrtMeta = "Jellyfin.MeiamSub.Assrt\meta.json"
 $EmbyThunderCsproj = "Emby.MeiamSub.Thunder\Emby.MeiamSub.Thunder.csproj"
 $EmbyShooterCsproj = "Emby.MeiamSub.Shooter\Emby.MeiamSub.Shooter.csproj"
+$EmbyAssrtCsproj = "Emby.MeiamSub.Assrt\Emby.MeiamSub.Assrt.csproj"
 
 # Update NuGet package version if specified
 if ($JellyfinVersion) {
     Write-Host "Upgrading Jellyfin.Controller NuGet dependency to $JellyfinVersion..." -ForegroundColor Yellow
     (Get-Content $ThunderCsproj) -replace '<PackageReference Include="Jellyfin.Controller" Version="[^"]+" />', "<PackageReference Include=`"Jellyfin.Controller`" Version=`"$JellyfinVersion`" />" | Set-Content $ThunderCsproj
     (Get-Content $ShooterCsproj) -replace '<PackageReference Include="Jellyfin.Controller" Version="[^"]+" />', "<PackageReference Include=`"Jellyfin.Controller`" Version=`"$JellyfinVersion`" />" | Set-Content $ShooterCsproj
+    (Get-Content $AssrtCsproj) -replace '<PackageReference Include="Jellyfin.Controller" Version="[^"]+" />', "<PackageReference Include=`"Jellyfin.Controller`" Version=`"$JellyfinVersion`" />" | Set-Content $AssrtCsproj
 }
 
 if ($EmbyVersion) {
@@ -44,6 +48,8 @@ if ($EmbyVersion) {
                                      -replace '<PackageReference Include="MediaBrowser.Server.Core" Version="[^"]+" />', "<PackageReference Include=`"MediaBrowser.Server.Core`" Version=`"$EmbyVersion`" />" | Set-Content $EmbyThunderCsproj
     (Get-Content $EmbyShooterCsproj) -replace '<PackageReference Include="MediaBrowser.Common" Version="[^"]+" />', "<PackageReference Include=`"MediaBrowser.Common`" Version=`"$EmbyVersion`" />" `
                                      -replace '<PackageReference Include="MediaBrowser.Server.Core" Version="[^"]+" />', "<PackageReference Include=`"MediaBrowser.Server.Core`" Version=`"$EmbyVersion`" />" | Set-Content $EmbyShooterCsproj
+    (Get-Content $EmbyAssrtCsproj) -replace '<PackageReference Include="MediaBrowser.Common" Version="[^"]+" />', "<PackageReference Include=`"MediaBrowser.Common`" Version=`"$EmbyVersion`" />" `
+                                     -replace '<PackageReference Include="MediaBrowser.Server.Core" Version="[^"]+" />', "<PackageReference Include=`"MediaBrowser.Server.Core`" Version=`"$EmbyVersion`" />" | Set-Content $EmbyAssrtCsproj
 }
 
 Write-Host "Updating version and timestamp in project files..." -ForegroundColor Yellow
@@ -63,6 +69,14 @@ Write-Host "Updating version and timestamp in project files..." -ForegroundColor
 (Get-Content $ShooterMeta) -replace '"version":\s*"[\d\.]+"', "`"version`": `"$Version`"" `
                            -replace '"timestamp":\s*"[^"]+"', "`"timestamp`": `"$Timestamp`"" | Set-Content $ShooterMeta
 
+# Update Jellyfin Assrt
+(Get-Content $AssrtCsproj) -replace '<Version>[\d\.]+</Version>', "<Version>$Version</Version>" `
+                           -replace '<AssemblyVersion>[\d\.]+</AssemblyVersion>', "<AssemblyVersion>$Version</AssemblyVersion>" `
+                           -replace '<FileVersion>[\d\.]+</FileVersion>', "<FileVersion>$Version</FileVersion>" | Set-Content $AssrtCsproj
+
+(Get-Content $AssrtMeta) -replace '"version":\s*"[\d\.]+"', "`"version`": `"$Version`"" `
+                         -replace '"timestamp":\s*"[^"]+"', "`"timestamp`": `"$Timestamp`"" | Set-Content $AssrtMeta
+
 # Update Emby Thunder
 (Get-Content $EmbyThunderCsproj) -replace '<Version>[\d\.]+</Version>', "<Version>$Version</Version>" `
                                  -replace '<AssemblyVersion>[\d\.]+</AssemblyVersion>', "<AssemblyVersion>$Version</AssemblyVersion>" `
@@ -72,6 +86,11 @@ Write-Host "Updating version and timestamp in project files..." -ForegroundColor
 (Get-Content $EmbyShooterCsproj) -replace '<Version>[\d\.]+</Version>', "<Version>$Version</Version>" `
                                  -replace '<AssemblyVersion>[\d\.]+</AssemblyVersion>', "<AssemblyVersion>$Version</AssemblyVersion>" `
                                  -replace '<FileVersion>[\d\.]+</FileVersion>', "<FileVersion>$Version</FileVersion>" | Set-Content $EmbyShooterCsproj
+
+# Update Emby Assrt
+(Get-Content $EmbyAssrtCsproj) -replace '<Version>[\d\.]+</Version>', "<Version>$Version</Version>" `
+                               -replace '<AssemblyVersion>[\d\.]+</AssemblyVersion>', "<AssemblyVersion>$Version</AssemblyVersion>" `
+                               -replace '<FileVersion>[\d\.]+</FileVersion>', "<FileVersion>$Version</FileVersion>" | Set-Content $EmbyAssrtCsproj
 
 Write-Host "Versions and timestamps updated successfully!" -ForegroundColor Green
 
@@ -85,16 +104,19 @@ $TempDir = "Release\temp_pack"
 $EmbyPackDir = "$TempDir\Emby"
 $JellyfinShooterPackDir = "$TempDir\Jellyfin\Jellyfin.MeiamSub.Shooter_$Version"
 $JellyfinThunderPackDir = "$TempDir\Jellyfin\Jellyfin.MeiamSub.Thunder_$Version"
+$JellyfinAssrtPackDir = "$TempDir\Jellyfin\Jellyfin.MeiamSub.Assrt_$Version"
 
 # Clean temp directories
 if (Test-Path $TempDir) { Remove-Item -Recurse -Force $TempDir }
 New-Item -ItemType Directory -Force -Path $EmbyPackDir | Out-Null
 New-Item -ItemType Directory -Force -Path $JellyfinShooterPackDir | Out-Null
 New-Item -ItemType Directory -Force -Path $JellyfinThunderPackDir | Out-Null
+New-Item -ItemType Directory -Force -Path $JellyfinAssrtPackDir | Out-Null
 
 # Copy Emby DLLs
 Copy-Item Release\Emby.MeiamSub.Shooter.dll $EmbyPackDir\
 Copy-Item Release\Emby.MeiamSub.Thunder.dll $EmbyPackDir\
+Copy-Item Release\Emby.MeiamSub.Assrt.dll $EmbyPackDir\
 
 # Copy Jellyfin Shooter artifacts
 Copy-Item Release\Jellyfin.MeiamSub.Shooter.dll $JellyfinShooterPackDir\
@@ -105,6 +127,11 @@ Copy-Item Jellyfin.MeiamSub.Shooter\thumb.png $JellyfinShooterPackDir\
 Copy-Item Release\Jellyfin.MeiamSub.Thunder.dll $JellyfinThunderPackDir\
 Copy-Item Jellyfin.MeiamSub.Thunder\meta.json $JellyfinThunderPackDir\
 Copy-Item Jellyfin.MeiamSub.Thunder\thumb.png $JellyfinThunderPackDir\
+
+# Copy Jellyfin Assrt artifacts
+Copy-Item Release\Jellyfin.MeiamSub.Assrt.dll $JellyfinAssrtPackDir\
+Copy-Item Jellyfin.MeiamSub.Assrt\meta.json $JellyfinAssrtPackDir\
+Copy-Item Jellyfin.MeiamSub.Assrt\thumb.png $JellyfinAssrtPackDir\
 
 # Archive target paths
 $EmbyZip = "Release\Emby_v$Version.zip"
